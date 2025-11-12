@@ -3,6 +3,7 @@ scalaVersion := "2.13.10"
 // library name
 name := "l2-cache"
 
+Compile / unmanagedSourceDirectories += baseDirectory.value / "../patmos/hardware/src"
 Compile / unmanagedSourceDirectories += baseDirectory.value / "../soc-comm/src"
 
 scalacOptions ++= Seq(
