@@ -32,6 +32,13 @@ jobs:
           repository: t-crest/patmos
           path: patmos
 
+      # Checkout argo
+      - name: Checkout patmos repository
+        uses: actions/checkout@v3
+        with:
+          repository: t-crest/argo
+          path: argo
+
       # Checkout tacle benchmarks
       - name: Checkout tacle benchmark repository
         uses: actions/checkout@v3
@@ -61,8 +68,10 @@ jobs:
       - name: Build patmos emulator
         working-directory: ./patmos
         run: |
+          mkdir -p local/bin
           cd hardware/config/
           sed -i '17i\<L2Cache size="64k" ways="8" bytesPerBlock="64" repl="plru" />' altde2-115.xml
+          sed -i '10s/.*/<!-- -->/' hardware/config/altde2-115.xml
           cd ../..
           make emulator
 
