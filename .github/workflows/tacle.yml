@@ -34,8 +34,8 @@ jobs:
         run: echo "$HOME/t-crest/local/bin" >> $GITHUB_PATH
 
       - name: Setup tools
-        working-directory: t-crest/misc
-        run: ./build.sh -q llvm2 patmos
+        working-directory: t-crest/
+        run: ./misc/build.sh -q llvm2 patmos
 
       - name: Verify patmos-clang
         run: patmos-clang --version
