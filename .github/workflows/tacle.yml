@@ -38,12 +38,6 @@ jobs:
         working-directory: t-crest/
         run: ./misc/build.sh -q
 
-      - name: Verify patmos-clang
-        run: patmos-clang --version
-
-      - name: Verify emulator
-        run: patemu -h
-
       # Checkout TACLe benchmarks
       - name: Checkout TACLe benchmark repository
         uses: actions/checkout@v3
@@ -67,11 +61,17 @@ jobs:
 #        working-directory: ./tacle
 #        run: ../local/patemu -h
 
-      - name: Run tacle benchmarks
+      - name: Verify patmos-clang
+        run: patmos-clang --version
+
+      - name: Verify emulator
+        run: patemu -h
+
+      - name: Run TACLe benchmarks
         working-directory: t-crest/tacle/bench
         run: |
           COMPILER=patmos-clang
-          OPTIONS=" -Wall -Wno-unknown-pragmas -Werror -O2"
+          COMPILER_OPTIONS=" -Wall -Wno-unknown-pragmas -Werror -O2"
           EXEC=pasim
           PASS=0
           FAIL_COMP=0
@@ -106,6 +106,21 @@ jobs:
 
                   if [ -f *.o ]; then
                       rm *.o
+                  fi
+          
+                  if [ -f a.out ]; then
+                      $EXEC ./a.out &>/dev/null
+                      RETURNVALUE=$(echo $?)
+                      if [ $RETURNVALUE -eq 0 ]; then
+                          printf "passed. \n"
+                          ((PASS++))
+                      else
+                          printf "failed (wrong return value $RETURNVALUE). \n"
+                          ((FAIL_EXEC++))
+                      fi
+                  else
+                    printf "failed (compiled with errors/warnings). \n"
+                    ((FAIL_COMP++))
                   fi
 
                   cd ..
