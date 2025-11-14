@@ -46,11 +46,11 @@ jobs:
 
       # TODO: Better add an l2 config file in patmos
       - name: Build patmos emulator with L2
-        working-directory: ./t-crest/patmos
+        working-directory: t-crest/
         run: |
-          cd hardware/config/
-          sed -i '17i\<L2Cache size="64k" ways="8" bytesPerBlock="64" repl="plru" />' altde2-115.xml
-          cd ../..
+          cd patmos/
+          sed -i '17i\<L2Cache size="64k" ways="8" bytesPerBlock="64" repl="plru" />' hardware/config/altde2-115.xml
+          cat hardware/config/altde2-115.xml
           make emulator
 
       - name: Verify patmos-clang
@@ -64,7 +64,7 @@ jobs:
         run: |
           COMPILER=patmos-clang
           COMPILER_OPTIONS=" -Wall -Wno-unknown-pragmas -Werror -O2"
-          EXEC=pasim
+          EXEC=patemu
           PASS=0
           FAIL_COMP=0
           FAIL_EXEC=0
@@ -77,11 +77,10 @@ jobs:
               cd "$dir"
 
               for BENCH in */ ; do
-                  # Skip certain subdirectories
+                  # Skip benchmarks that do not compile or not work properly
                   case "$dir$BENCH" in
                       "kernel/pm/"| \
                       "kernel/isqrt/"| \
-                      "kernel/fft/"| \
                       "sequential/rijndael_dec/"| \
                       "sequential/rijndael_enc/")
                           echo "Skipping ${dir}${BENCH}"
@@ -103,7 +102,7 @@ jobs:
                   $COMPILER $COMPILER_OPTIONS *.c
           
                   if [ -f a.out ]; then
-                      $EXEC ./a.out &>/dev/null
+                      $EXEC ./a.out
                       RETURNVALUE=$(echo $?)
                       if [ $RETURNVALUE -eq 0 ]; then
                           printf "passed. \n"
