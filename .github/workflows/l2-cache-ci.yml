@@ -1,16 +1,55 @@
-name: TACLe Benchmark Test
+name: Sbt Test
 
 on:
   push:
     branches:
-      - "*"
+      - '**'
   pull_request:
-    branches:
-      - "*"
+  schedule:
+    - cron: '00 1 * * MON'
 
 jobs:
-  test:
+
+  scala-test:
     runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout current repository
+        uses: actions/checkout@v3
+        with:
+          path: l2-cache
+
+      - name: Checkout soc-comm repository
+        uses: actions/checkout@v3
+        with:
+          repository: t-crest/soc-comm
+          path: soc-comm
+
+      - name: Checkout patmos repository
+        uses: actions/checkout@v3
+        with:
+          repository: t-crest/patmos
+          path: patmos
+
+      # Chisel test is only compatible with older versions of verilator
+      - name: Setup verilator
+        uses: v0xnihili/install-verilator-action@main
+        with:
+          version: "v4.100"
+
+      - name: Verify verilator
+        run: verilator --version
+
+      - name: Setup Scala
+        uses: olafurpg/setup-scala@v14
+
+      - name: Run sbt tests
+        working-directory: ./l2-cache
+        run: sbt test
+
+  tacle-bench-test:
+    runs-on: ubuntu-latest
+    needs: [scala-test]
 
     steps:
       - name: Install prerequisites
@@ -63,7 +102,7 @@ jobs:
         working-directory: t-crest/tacle/bench
         run: |
           set +e
-          
+
           COMPILER=patmos-clang
           COMPILER_OPTIONS=" -Wall -Wno-unknown-pragmas -Werror -O2"
           EXEC=patemu
@@ -100,9 +139,9 @@ jobs:
                   if [ -f *.o ]; then
                       rm *.o
                   fi
-          
+
                   $COMPILER $COMPILER_OPTIONS *.c
-          
+
                   if [ -f a.out ]; then
                       $EXEC ./a.out
                       RETURNVALUE=$(echo $?)
@@ -124,3 +163,9 @@ jobs:
               printf "Leaving ${dir}\n\n"
               cd ..
           done
+
+          echo "PASS: $PASS, FAIL_COMP: $FAIL_COMP, FAIL_EXEC: $FAIL_EXEC"
+
+          if [ "$FAIL_EXEC" -gt 0 ]; then
+              exit 1
+          fi
