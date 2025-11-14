@@ -27,7 +27,7 @@ jobs:
 
       - name: Setup tools
         working-directory: t-crest/misc
-        run: ./build.sh llvm2 patmos
+        run: ./build.sh -q llvm2 patmos
 
       - name: Verify patmos-clang
         run: patmos-clang --version
@@ -77,51 +77,51 @@ jobs:
 #      - name: Verify patmos emulator
 #        working-directory: ./tacle
 #        run: ../local/patemu -h
-#
-#      - name: Run tacle benchmarks
-#        working-directory: ./tacle/bench
-#        run: |
-#          COMPILER=patmos-clang
-#          OPTIONS=" -Wall -Wno-unknown-pragmas -Werror -O2"
-#          EXEC=pasim
-#          PASS=0
-#          FAIL_COMP=0
-#          FAIL_EXEC=0
-#
-#          for dir in */ ; do
-#              # Skip the 'parallel' directory entirely
-#              [[ "$dir" == "parallel/" ]] && continue
-#
-#              printf "Entering ${dir}\n"
-#              cd "$dir"
-#
-#              for BENCH in */ ; do
-#                  # Skip certain subdirectories
-#                  case "$dir$BENCH" in
-#                      "kernel/pm/"| \
-#                      "kernel/isqrt/"| \
-#                      "kernel/fft/"| \
-#                      "sequential/rijndael_dec/"| \
-#                      "sequential/rijndael_enc/")
-#                          echo "Skipping ${dir}${BENCH}"
-#                          continue
-#                          ;;
-#                  esac
-#
-#                  printf "Checking ${dir}${BENCH}\n"
-#                  cd "$BENCH"
-#
-#                  if [ -f a.out ]; then
-#                      rm a.out
-#                  fi
-#
-#                  if [ -f *.o ]; then
-#                      rm *.o
-#                  fi
-#
-#                  cd ..
-#              done
-#
-#              printf "Leaving ${dir}\n\n"
-#              cd ..
-#          done
+
+      - name: Run tacle benchmarks
+        working-directory: t-crest/tacle/bench
+        run: |
+          COMPILER=patmos-clang
+          OPTIONS=" -Wall -Wno-unknown-pragmas -Werror -O2"
+          EXEC=pasim
+          PASS=0
+          FAIL_COMP=0
+          FAIL_EXEC=0
+
+          for dir in */ ; do
+              # Skip the 'parallel' directory entirely
+              [[ "$dir" == "parallel/" ]] && continue
+
+              printf "Entering ${dir}\n"
+              cd "$dir"
+
+              for BENCH in */ ; do
+                  # Skip certain subdirectories
+                  case "$dir$BENCH" in
+                      "kernel/pm/"| \
+                      "kernel/isqrt/"| \
+                      "kernel/fft/"| \
+                      "sequential/rijndael_dec/"| \
+                      "sequential/rijndael_enc/")
+                          echo "Skipping ${dir}${BENCH}"
+                          continue
+                          ;;
+                  esac
+
+                  printf "Checking ${dir}${BENCH}\n"
+                  cd "$BENCH"
+
+                  if [ -f a.out ]; then
+                      rm a.out
+                  fi
+
+                  if [ -f *.o ]; then
+                      rm *.o
+                  fi
+
+                  cd ..
+              done
+
+              printf "Leaving ${dir}\n\n"
+              cd ..
+          done
