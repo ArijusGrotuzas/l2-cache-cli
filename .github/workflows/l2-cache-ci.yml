@@ -88,7 +88,7 @@ jobs:
       - name: Package tools
         run: |
           mkdir artifacts
-          cp -r t-crest/local/bin artifacts/
+          cp -r t-crest/local/* artifacts/
 
       - name: Upload tools
         uses: actions/upload-artifact@v4
@@ -107,14 +107,12 @@ jobs:
           name: patmos-tools
           path: artifacts/
 
-      - name: Re add execution permission to downloads
+      - name: Add tools to path
         run: |
-          cd artifacts/bin
-          sudo chmod +x ./patmos-clang
-          sudo chmod +x ./patemu
-
-      - name: Add toolchain to PATH
-        run: echo "$PWD/artifacts/bin" >> $GITHUB_PATH
+          mkdir local/
+          cp -r artifacts/* local/
+          sudo chmod +x local/bin/*
+          echo "$PWD/local/bin" >> $GITHUB_PATH
 
       - name: Verify patmos-clang
         run: patmos-clang --version
@@ -308,14 +306,12 @@ jobs:
           name: patmos-tools
           path: artifacts/
 
-      - name: Re add execution permission to downloads
+      - name: Add tools to path
         run: |
-          cd artifacts/bin
-          sudo chmod +x ./patmos-clang
-          sudo chmod +x ./patemu
-
-      - name: Add toolchain to PATH
-        run: echo "$PWD/artifacts/bin" >> $GITHUB_PATH
+          mkdir local/
+          cp -r artifacts/* local/
+          sudo chmod +x local/bin/*
+          echo "$PWD/local/bin" >> $GITHUB_PATH
 
       - name: Verify patmos-clang
         run: patmos-clang --version
