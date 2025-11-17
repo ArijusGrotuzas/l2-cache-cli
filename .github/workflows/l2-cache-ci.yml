@@ -74,7 +74,7 @@ jobs:
 
       - name: Setup tools
         working-directory: t-crest/
-        run: ./misc/build.sh -q simulator llvm2 argo soc-comm poseidon patmos #bench
+        run: ./misc/build.sh -q simulator llvm2 argo soc-comm poseidon patmos bench
 
 #      # TODO: Better add an l2 config file in patmos
 #      - name: Build patmos emulator with L2 cache
@@ -88,8 +88,6 @@ jobs:
       - name: Package tools
         run: |
           mkdir artifacts
-          mkdir -p t-crest/bench
-          touch t-crest/bench/temp.txt 
           cp -vr t-crest/local artifacts/
           cp -vr t-crest/misc artifacts/
           cp -vr t-crest/bench artifacts/
@@ -289,9 +287,6 @@ jobs:
           sudo chmod -v +x t-crest/local/bin/*
           echo "$PWD/t-crest/local/bin" >> $GITHUB_PATH
 
-      - name: Build patmos bench
-        run: t-crest/misc/build.sh -q bench
-
       - name: Verify patmos-clang
         run: patmos-clang --version
 
@@ -301,4 +296,4 @@ jobs:
       - name: Patmos benchmarks
         run: |
           sed -i '328i\    set_tests_properties(${name}_hw PROPERTIES TIMEOUT 18000)' t-crest/bench/cmake/patmos-clang-toolchain.cmake
-          t-crest/misc/build.sh -t bench
+          sudo chmod +x t-crest/misc/build.sh && t-crest/misc/build.sh -t bench
