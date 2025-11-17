@@ -91,7 +91,7 @@ class SharedPipelinedCache(
         s"Memory Burst Length = $memBurstLen beats, " +
         s"Miss Q depth = $mshrCnt, " +
         s"Miss Q half miss cmds per entry = $halfMissCmdCnt cmds, " +
-        s"Number of Cores = $nCores" + "\n"
+        s"Number of Cores = $nCores"
     )
 
     repPol.printConfig() // Print configuration of replacement policy

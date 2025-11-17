@@ -316,8 +316,8 @@ jobs:
       - name: Checkout patmos-misc
         uses: actions/checkout@v3
         with:
-          repository: t-crest/patmos-misc
-          path: t-crest/misc
+          repository: patmos-misc
+          path: misc
 
       - name: Setup patmos bench
         run: misc/build.sh -q bench
