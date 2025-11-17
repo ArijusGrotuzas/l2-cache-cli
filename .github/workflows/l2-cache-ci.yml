@@ -181,7 +181,7 @@ jobs:
           cp l2-cache/tacle-test/tacle_test.sh tacle/bench/kernel/
           cd tacle/bench/kernel/
           chmod +x tacle_test.sh
-          ./tacle_test.sh --skp pm/ --skip isqrt/
+          ./tacle_test.sh --skip pm/ --skip isqrt/
 
   tacle-bench-sequential-test:
     runs-on: ubuntu-latest
