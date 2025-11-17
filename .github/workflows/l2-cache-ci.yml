@@ -313,6 +313,15 @@ jobs:
           sudo chmod +x local/bin/*
           echo "$PWD/local/bin" >> $GITHUB_PATH
 
+      - name: Checkout patmos-misc
+        uses: actions/checkout@v3
+        with:
+          repository: t-crest/patmos-misc
+          path: t-crest/misc
+
+      - name: Setup patmos bench
+        run: misc/build.sh -q bench
+
       - name: Verify patmos-clang
         run: patmos-clang --version
 
@@ -320,4 +329,4 @@ jobs:
         run: patemu -h
 
       - name: Patmos benchmarks
-        run: echo "\n"
+        run: misc/build.sh -t bench
