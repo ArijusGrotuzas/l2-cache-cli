@@ -28,35 +28,35 @@ jobs:
       - name: Checkout L2-cache
         uses: actions/checkout@v3
         with:
-          path: ${{env.L2_PATH}}
+          path: ${{ env.T_CREST_PATH }}${{ env.L2_PATH }}
 
       - name: Checkout soc-comm
         uses: actions/checkout@v3
         with:
           repository: t-crest/soc-comm
-          path: ${{env.SOC_COMM_PATH}}
+          path: ${{ env.T_CREST_PATH }}${{ env.SOC_COMM_PATH }}
 
       - name: Checkout patmos
         uses: actions/checkout@v3
         with:
           repository: t-crest/patmos
-          path: ${{env.PATMOS_PATH}}
+          path: ${{ env.T_CREST_PATH }}${{ env.PATMOS_PATH }}
 
       # Chisel test is only compatible with older versions of verilator
-#      - name: Setup verilator
-#        uses: v0xnihili/install-verilator-action@main
-#        with:
-#          version: "v4.100"
-#
-#      - name: Verify verilator
-#        run: verilator --version
-#
-#      - name: Setup Scala
-#        uses: olafurpg/setup-scala@v14
-#
-#      - name: Run sbt tests
-#        working-directory: ./l2-cache
-#        run: sbt test
+      - name: Setup verilator
+        uses: v0xnihili/install-verilator-action@main
+        with:
+          version: "v4.100"
+
+      - name: Verify verilator
+        run: verilator --version
+
+      - name: Setup Scala
+        uses: olafurpg/setup-scala@v14
+
+      - name: Run sbt tests
+        working-directory: ${{ env.T_CREST_PATH }}${{ env.L2_PATH }}
+        run: sbt test
 
   build-tools:
     runs-on: ubuntu-latest
@@ -92,21 +92,21 @@ jobs:
         working-directory: ${{ env.T_CREST_PATH }}
         run: ${{ env.MISC_PATH }}build.sh -q simulator llvm2 argo soc-comm poseidon patmos #bench
 
-#      # TODO: Better add an l2 config file in patmos
-#      - name: Build patmos emulator with L2 cache
-#        working-directory: ${{ env.T_CREST_PATH }}
-#        run: |
-#          cd ${{ env.PATMOS_PATH }}
-#          sed -i '17i\<L2Cache size="64k" ways="8" bytesPerBlock="64" repl="plru" />' hardware/config/altde2-115.xml
-#          cat hardware/config/altde2-115.xml
-#          make emulator
-#
-#      - name: Re-build bench with increased timeout
-#        working-directory: ${{ env.T_CREST_PATH }}
-#        run: |
-#          sed -i '328c\    set_tests_properties(${name}_hw PROPERTIES TIMEOUT 18000)' ${{ env.BENCH_PATH }}/cmake/patmos-clang-toolchain.cmake
-#          cd ${{ env.BENCH_PATH }}build
-#          make
+      # TODO: Better add an l2 config file in patmos
+      - name: Build patmos emulator with L2 cache
+        working-directory: ${{ env.T_CREST_PATH }}
+        run: |
+          cd ${{ env.PATMOS_PATH }}
+          sed -i '17i\<L2Cache size="64k" ways="8" bytesPerBlock="64" repl="plru" />' hardware/config/altde2-115.xml
+          cat hardware/config/altde2-115.xml
+          make emulator
+
+      - name: Re-build bench with increased timeout
+        working-directory: ${{ env.T_CREST_PATH }}
+        run: |
+          sed -i '328c\    set_tests_properties(${name}_hw PROPERTIES TIMEOUT 18000)' ${{ env.BENCH_PATH }}/cmake/patmos-clang-toolchain.cmake
+          cd ${{ env.BENCH_PATH }}build
+          make
 
       - name: Package tools
         run: |
@@ -255,39 +255,24 @@ jobs:
           cp -v ${{ env.L2_PATH }}scripts/tacle_test.sh ${{ env.TACLE_PATH }}bench/test/
           cd ${{ env.TACLE_PATH }}bench/test/
           sudo chmod -v +x ./tacle_test.sh && ./tacle_test.sh
-#
-#  patmos-bench:
-#    runs-on: ubuntu-latest
-#    needs: [ build-tools ]
-#
-#    steps:
-#      - name: Download tools
-#        uses: actions/download-artifact@v4
-#        with:
-#          name: patmos-tools
-#          path: artifacts/
-#
-#      - name: Add tools to path
-#        run: |
-#          mkdir t-crest/
-#          cp -vr artifacts/local t-crest/
-#          cp -vr artifacts/misc t-crest/
-#          cp -vr artifacts/bench t-crest/
-#          sudo chmod -v +x t-crest/local/bin/*
-#          echo "$PWD/t-crest/local/bin" >> $GITHUB_PATH
-#
-#      - name: Verify patmos-clang
-#        run: patmos-clang --version
-#
-#      - name: Verify emulator
-#        run: patemu -h
-#
-#      - name: Patmos benchmarks
-#        run: |
-#          sed -i '328c\    set_tests_properties(${name}_hw PROPERTIES TIMEOUT 18000)' t-crest/bench/cmake/patmos-clang-toolchain.cmake
-#          cd t-crest/bench/build
-#          ctest $PATMOS_BENCH_JOBS -v
 
-#          sudo chmod -v +x t-crest/local/bin/*
+  patmos-bench:
+    runs-on: ubuntu-latest
+    needs: [ build-tools ]
 
-#          cp -vr ${{ env.ARTIFACTS_PATH }}${{ env.TOOLS_PATH }} ${{ env.T_CREST_PATH }}
+    steps:
+      - name: Download tools
+        uses: actions/download-artifact@v4
+        with:
+          name: patmos-tools
+          path: ${{ env.ARTIFACTS_PATH }}
+
+      - name: Unpack tools
+        run: |
+          tar -xvf ${{ env.ARTIFACTS_PATH }}tools.tar
+          echo "$PWD/${{ env.T_CREST_PATH }}${{ env.TOOLS_PATH }}bin" >> $GITHUB_PATH
+
+      - name: Patmos benchmarks
+        run: |
+          cd ${{ env.T_CREST_PATH }}${{ env.BENCH_PATH }}
+          ctest $PATMOS_BENCH_JOBS -v
