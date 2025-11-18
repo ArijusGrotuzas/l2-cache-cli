@@ -90,7 +90,7 @@ jobs:
 
       - name: Setup tools
         working-directory: ${{ env.T_CREST_PATH }}
-        run: ${{ env.MISC_PATH }}build.sh -q simulator llvm2 argo soc-comm poseidon patmos #bench
+        run: ${{ env.MISC_PATH }}build.sh -q simulator llvm2 argo soc-comm poseidon patmos bench
 
       # TODO: Better add an l2 config file in patmos
       - name: Build patmos emulator with L2 cache
@@ -104,7 +104,7 @@ jobs:
       - name: Re-build bench with increased timeout
         working-directory: ${{ env.T_CREST_PATH }}
         run: |
-          sed -i '328c\    set_tests_properties(${name}_hw PROPERTIES TIMEOUT 18000)' ${{ env.BENCH_PATH }}/cmake/patmos-clang-toolchain.cmake
+          sed -i '328c\    set_tests_properties(${name}_hw PROPERTIES TIMEOUT 18000)' ${{ env.BENCH_PATH }}cmake/patmos-clang-toolchain.cmake
           cd ${{ env.BENCH_PATH }}build
           make
 
