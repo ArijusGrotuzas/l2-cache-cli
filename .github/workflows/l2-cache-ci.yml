@@ -86,7 +86,7 @@ jobs:
 
       - name: Add path
         working-directory: t-crest/
-        run: echo "$PWD/${{ env.TOOLS_PATH}}bin" >> $GITHUB_PATH
+        run: echo "$PWD/${{ env.TOOLS_PATH }}bin" >> $GITHUB_PATH
 
       - name: Setup tools
         working-directory: ${{ env.T_CREST_PATH }}
@@ -123,7 +123,6 @@ jobs:
         with:
           name: patmos-tools
           path: ${{ env.ARTIFACTS_PATH }}
-
       - name: Unpack tools
         run: |
           cd ${{ env.ARTIFACTS_PATH }}
