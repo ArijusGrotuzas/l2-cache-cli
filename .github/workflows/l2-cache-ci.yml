@@ -1,5 +1,13 @@
 name: L2 cache CI
 
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+  schedule:
+    - cron: '00 1 * * MON'
+
 env:
   MISC_PATH: misc/
   BENCH_PATH: bench/
@@ -11,14 +19,6 @@ env:
   ARTIFACTS_PATH: artifacts/
   TACLE_PATH: tacle/
   PATMOS_BENCH_JOBS: -j6
-
-on:
-  push:
-    branches:
-      - '**'
-  pull_request:
-  schedule:
-    - cron: '00 1 * * MON'
 
 jobs:
   scala-test:
@@ -104,7 +104,7 @@ jobs:
         run: |
           mkdir ${{ env.ARTIFACTS_PATH }}
           cd ${{ env.ARTIFACTS_PATH }}
-          tar -cvf tools.tar ${{ env.T_CREST_PATH }}${{ env.TOOL_PATH }} ${{ env.T_CREST_PATH }}${{ env.MISC_PATH }} # ${{ env.T_CREST_PATH }}${{ env.BENCH_PATH }}
+          tar -cvf tools.tar ${{ env.T_CREST_PATH }}${{ env.TOOL_PATH }} ${{ env.T_CREST_PATH }}${{ env.MISC_PATH }}
 
       - name: Upload tools
         uses: actions/upload-artifact@v4
