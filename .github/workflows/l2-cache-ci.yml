@@ -105,7 +105,7 @@ jobs:
         run: |
           mkdir ${{ env.ARTIFACTS_PATH }}
           cd ${{ env.ARTIFACTS_PATH }}
-          tar -cvf tools.tar ${{ env.T_CREST_PATH }}${{ env.TOOLS_PATH }} ${{ env.T_CREST_PATH }}${{ env.MISC_PATH }}
+          tar -cvf tools.tar ../${{ env.T_CREST_PATH }}${{ env.TOOLS_PATH }} ../${{ env.T_CREST_PATH }}${{ env.MISC_PATH }}
 
       - name: Upload tools
         uses: actions/upload-artifact@v4
