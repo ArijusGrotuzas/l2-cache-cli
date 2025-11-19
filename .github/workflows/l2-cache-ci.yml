@@ -274,5 +274,5 @@ jobs:
 
       - name: Patmos benchmarks
         run: |
-          cd ${{ env.T_CREST_PATH }}${{ env.BENCH_PATH }}
+          cd ${{ env.T_CREST_PATH }}${{ env.BENCH_PATH }}build
           ctest -j${{ env.PATMOS_BENCH_JOBS }}
